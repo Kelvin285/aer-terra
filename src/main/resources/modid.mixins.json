@@ -1,0 +1,44 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "kelvin.trewrite.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+	"ChunkGeneratorMixin",
+	"SpawnSettingsMixin",
+	"BiomeAccessMixin",
+	"CaveCarverMixin",
+	"RavineCarverMixin",
+	"ChunkGeneratorSettingsMixin",
+	"NoiseChunkGeneratorMixin",
+	"InventoryMixin",
+	"HungerManagerMixin",
+	"PlayerInteractEntityC2SPacketMixin",
+	"ZombieEntityMixin",
+	"PlayerInventoryMixin",
+	"PlayerScreenHandlerMixin",
+	"CaveVinesBodyBlockMixin",
+	"CaveVinesHeadBlockMixin",
+	"ConcretePowderBlockMixin",
+	"MossBlockMixin",
+	"MushroomPlantBlockMixin",
+	"CactusBlockMixin"
+  ],
+  "client": [
+    "TitleScreenMixin",
+    "PlayerEntityRendererMixin",
+	"CameraMixin",
+	"PlayerEntityModelMixin",
+	"ClientPlayerEntityMixin",
+	"InGameHudMixin",
+	"ZombieEntityRendererMixin",
+	"InventoryScreenMixin",
+	"CreativeScreenHandlerMixin",
+	"BiomeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
