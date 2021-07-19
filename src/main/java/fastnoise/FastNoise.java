@@ -26,7 +26,7 @@
 // off every 'zix'.)
 //
 
-//modified by Kelvin285 (removed Vector2 and Vector3.  Replaced with vx, vy, vz)
+//modified (removed Vector2 and Vector3.  Replaced with vx, vy, vz)
 package fastnoise;
 
 public class FastNoise {

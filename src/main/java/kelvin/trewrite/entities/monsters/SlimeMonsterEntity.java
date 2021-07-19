@@ -13,6 +13,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 	
 	public SlimeMonsterEntity(EntityType<? extends SlimeMonsterEntity> entityType, World world) {
 		super(entityType, world);
+		this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(10);
 	}
 	
 	@Override

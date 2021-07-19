@@ -24,7 +24,9 @@
 	"ConcretePowderBlockMixin",
 	"MossBlockMixin",
 	"MushroomPlantBlockMixin",
-	"CactusBlockMixin"
+	"CactusBlockMixin",
+	"PlantBlockMixin",
+	"ItemStackMixin"
   ],
   "client": [
     "TitleScreenMixin",

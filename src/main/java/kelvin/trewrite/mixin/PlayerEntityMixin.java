@@ -9,6 +9,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import kelvin.trewrite.main.resources.EntitySpawner;
+import kelvin.trewrite.main.resources.ItemHelper;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -17,9 +20,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -35,6 +41,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	protected float weapon_wait = 0;
 	
 	@Shadow
+	public int experienceLevel;
+	@Shadow
+	public int totalExperience;
+	
+	@Shadow
+	public float experienceProgress;
+	
+	@Shadow
 	protected HungerManager hungerManager;
 	
 	protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
@@ -44,13 +58,72 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	@Override
 	public boolean isSprinting() {
 		if (this.stamina_recovery) {
-			this.setSprinting(false);
+			//this.setSprinting(false);
 			return false;
 		}
 		return super.isSprinting();
 		//return this.getFlag(3);
 	}
 	
+	@Inject(at = @At("HEAD"), method = "getNextLevelExperience", cancellable = true)
+	public void getNextLevelExperience(CallbackInfoReturnable<Integer> info) {
+		info.setReturnValue(1);
+	}
+	
+	@Inject(at = @At("HEAD"), method = "getCurrentExperience", cancellable = true)
+	protected void getCurrentExperience(PlayerEntity player, CallbackInfoReturnable<Integer> info) {
+		if (this.getMainHandStack() != null) {
+			Item item = this.getMainHandStack().getItem();
+			if (item instanceof ToolItem || item instanceof TridentItem)
+			{
+				int level = ItemHelper.GetLevel(this.getMainHandStack());
+				info.setReturnValue(level * 7);
+				return;
+			}
+		}
+		info.setReturnValue(0);
+//		if (!this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !this.isSpectator()) {
+//			int i = this.experienceLevel * 7;
+//			return i > 100 ? 100 : i;
+//		} else {
+//			return 0;
+//		}
+	}
+	
+	@Inject(at = @At("HEAD"), method = "addExperience", cancellable = true)
+	public void addExperience(int experience, CallbackInfo info) {
+		if (this.getMainHandStack() != null) {
+			Item item = this.getMainHandStack().getItem();
+			if (item instanceof ToolItem || item instanceof TridentItem)
+			{
+				int level_up = ItemHelper.AddExperience(this.getMainHandStack(), experience);
+				int level = ItemHelper.GetLevel(this.getMainHandStack());
+				if (level_up > 0) {
+					if (!this.world.isClient) { 
+						String item_name = I18n.translate(item.getTranslationKey());
+						
+						String command = "title " + this.getEntityName() + " actionbar \" "+ item_name +" LV ("+ (level - level_up) +") -> LV ("+ level +")!\"";
+						//System.out.println(command);
+						this.world.getServer().getCommandManager().execute(this.world.getServer().getCommandSource(), command);
+						//this.addExperienceLevels(1);
+						this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(),
+								SoundEvents.ENTITY_PLAYER_LEVELUP, this.getSoundCategory(), 0.75F, 1.0F);
+						
+						this.getMainHandStack().setCustomName(new TranslatableText(item_name + " LV (" + level + ")"));
+						
+						this.getMainHandStack().setDamage(0);
+					}
+				}
+			}
+		}
+		info.cancel();
+	}
+	
+	@Shadow
+	private void addExperienceLevels(int i) {
+		
+	}
+
 	@Inject(at = @At("HEAD"), method = "canTakeDamage", cancellable = true)
 	public void canTakeDamage(CallbackInfoReturnable<Boolean> info) {
 		if (this.dodge_ticks > 0) {
@@ -92,10 +165,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 			info.cancel();
 		} else {
 			if (!stamina_recovery) {
-				this.stamina -= 20;
-				stamina_wait = 20;
-			} else {
-				info.cancel();
+				this.stamina -= 5;
+				stamina_wait = 10;
 			}
 		}
 		
@@ -179,6 +250,24 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	
 	@Inject(at = @At("HEAD"), method = "tick")
 	public void tick(CallbackInfo info) {
+		
+//		if (this.getMainHandStack() != null) {
+//			Item item = this.getMainHandStack().getItem();
+//			if (item instanceof ToolItem || item instanceof TridentItem || item instanceof RangedWeaponItem)
+//			{
+//				int level = ItemHelper.GetLevel(this.getMainHandStack());
+//				int xp = ItemHelper.GetExperience(this.getMainHandStack());
+//				this.experienceProgress = xp / (float)(level * 10);
+//				this.experienceLevel = level;
+//				this.totalExperience = level * 7;
+//			} else {
+//				this.experienceLevel = 0;
+//				this.experienceProgress = 0;
+//				this.totalExperience = 0;
+//			}
+//		}
+		
+		EntitySpawner.TrySpawnEntities(this.getBlockPos().mutableCopy(), this.world);
 		getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(10);
 		
 		if (this.handSwingProgress > 0.4 && this.getMainHandStack() != null) {

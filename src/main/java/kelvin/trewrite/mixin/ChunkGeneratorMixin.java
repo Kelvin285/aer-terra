@@ -16,10 +16,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CaveVinesBodyBlock;
 import net.minecraft.block.CaveVinesHeadBlock;
+import net.minecraft.block.CoralBlock;
 import net.minecraft.block.FungusBlock;
 import net.minecraft.block.LeavesBlock;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.Hand;
+import net.minecraft.block.TallPlantBlock;
+import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -72,10 +73,10 @@ public class ChunkGeneratorMixin {
 		
 		int world_radius = 2400;
 		
-		int biome_width = 900;
-		int biome_length = 1200;
+		int biome_width = (int)(900 * 0.3f);
+		int biome_length = (int)(1200 * 0.3);
 		
-		int snow_position = right_jungle ? -1200 : 1200;
+		int snow_position = right_jungle ? 1200 : -1200;
 		
 		BlockState stone = corruption ? BlockRegistry.EBON_STONE.getDefaultState() : BlockRegistry.CRIMSON_STONE.getDefaultState();
 		BlockState grass = corruption ? BlockRegistry.EBON_GRASS.getDefaultState() : BlockRegistry.CRIMSON_GRASS.getDefaultState();
@@ -122,6 +123,7 @@ public class ChunkGeneratorMixin {
 					float cave_density = y / 256.0f;
 					if (cave_density > 0) cave_density = 0;
 					cave_density = -cave_density;
+					cave_density += 0.05f;
 					
 					float underworld_density = (y - underworld_height) / 5.0f;
 					
@@ -129,13 +131,15 @@ public class ChunkGeneratorMixin {
 					
 					float combined_stone = n + stone_density;
 					float combined_cave = (n * n) * cave_density;
-					float jungle_cave = jungle ? (n * (cave_density + 0.1f)) : 0;
+					float jungle_cave = jungle ? n : 0;
 
 					float combined_underworld = n + underworld_density;
 					float combined_underworld_base = n + underworld_base_density;
 					
 					boolean pure = Math.sqrt(x * x + y * y + z * z) <= purity_radius;
-					
+					if (y < 0) {
+						pure = n <= 0;
+					}
 
 					
 					if (y < base_height - 30) {
@@ -162,10 +166,10 @@ public class ChunkGeneratorMixin {
 						if (jungle) {
 							state = BlockRegistry.MUD.getDefaultState();
 						} else {
-							if (snow && !pure) {
+							if (snow && !pure && y > underworld_height + 60) {
 								state = Blocks.PACKED_ICE.getDefaultState();
 							} else {
-								if (desert) {
+								if (desert && y > underworld_height + 50) {
 									state = sandstone;
 								} else {
 									state = pure ? Blocks.STONE.getDefaultState() : stone;
@@ -181,12 +185,14 @@ public class ChunkGeneratorMixin {
 							state = Blocks.AIR.getDefaultState();
 						} else {
 							state = Blocks.CAVE_AIR.getDefaultState();
+							if (y < underworld_height + 5 || y >= -140 + n * 15 && y <= -130) {
+								state = Blocks.LAVA.getDefaultState();
+							}
 						}
 					}
 					
 					if (combined_underworld < threshold) {
 						state = Blocks.CAVE_AIR.getDefaultState();
-						
 					}
 					
 					if (y < underworld_base) {
@@ -207,6 +213,12 @@ public class ChunkGeneratorMixin {
 		
 		for (int x = chunkPos.getStartX(); x <= chunkPos.getEndX(); x++) {
 			for (int z = chunkPos.getStartZ(); z <= chunkPos.getEndZ(); z++) {
+				
+				double world_distance = Math.sqrt(x * x + z * z);
+
+				
+				boolean beach = world_distance >= 2400;
+				
 				for (int y = region.getBottomY(); y <= region.getTopY(); y++) {
 					if (y >= 252) continue;
 					boolean pure = Math.sqrt(x * x + y * y + z * z) <= purity_radius;
@@ -215,13 +227,58 @@ public class ChunkGeneratorMixin {
 					
 					placing_pos.set(x, y, z);
 					if (region.isChunkLoaded(placing_pos)) {
+						
+						if (region.getBlockState(placing_pos) == Blocks.LAVA.getDefaultState()) {
+							boolean place_stone = false;
+							placing_pos.set(x, y - 1, z);
+							if (region.isChunkLoaded(placing_pos)) {
+								if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+									place_stone = true;
+								}
+							}
+							placing_pos.set(x - 1, y, z);
+							if (region.isChunkLoaded(placing_pos)) {
+								if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+									place_stone = true;
+								}
+							}
+							placing_pos.set(x + 1, y, z);
+							if (region.isChunkLoaded(placing_pos)) {
+								if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+									place_stone = true;
+								}
+							}
+							placing_pos.set(x, y, z - 1);
+							if (region.isChunkLoaded(placing_pos)) {
+								if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+									place_stone = true;
+								}
+							}
+							placing_pos.set(x, y, z + 1);
+							if (region.isChunkLoaded(placing_pos)) {
+								if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+									place_stone = true;
+								}
+							}
+							if (place_stone) {
+								placing_pos.set(x, y, z);
+								region.setBlockState(placing_pos, pure ? Blocks.STONE.getDefaultState() : stone, 0);
+							}
+						}
+						
 						placing_pos.set(x, y + 1, z);
 						if (region.isChunkLoaded(placing_pos)) {
+							
 							if (region.getBlockState(placing_pos) == Blocks.AIR.getDefaultState()) {
 								placing_pos.set(x, y, z);
 								if (region.getBlockState(placing_pos) == Blocks.DIRT.getDefaultState())
 								region.setBlockState(placing_pos, pure ? Blocks.GRASS_BLOCK.getDefaultState() : grass, 0);
 								
+								if (region.getBlockState(placing_pos) == BlockRegistry.MUD.getDefaultState())
+									region.setBlockState(placing_pos, BlockRegistry.JUNGLE_GRASS.getDefaultState(), 0);
+							}
+							if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+								placing_pos.set(x, y, z);
 								if (region.getBlockState(placing_pos) == BlockRegistry.MUD.getDefaultState())
 									region.setBlockState(placing_pos, BlockRegistry.JUNGLE_GRASS.getDefaultState(), 0);
 							}
@@ -234,7 +291,8 @@ public class ChunkGeneratorMixin {
 								if (region.getBlockState(placing_pos) == Blocks.STONE.getDefaultState() ||
 										region.getBlockState(placing_pos) == BlockRegistry.EBON_STONE.getDefaultState() ||
 												region.getBlockState(placing_pos) == BlockRegistry.CRIMSON_STONE.getDefaultState() ||
-												region.getBlockState(placing_pos) == Blocks.DIRT.getDefaultState()) {
+												region.getBlockState(placing_pos) == Blocks.DIRT.getDefaultState() ||
+														region.getBlockState(placing_pos) == BlockRegistry.MUD.getDefaultState()) {
 									if (random.nextInt(5) >= 2) {
 										int height = random.nextInt(4) + 1;
 										if (pure) {
@@ -295,22 +353,85 @@ public class ChunkGeneratorMixin {
 								}
 								
 							} else if (random.nextInt(350) == 0) {
-								int height = random.nextInt(4) + 1;
 								
 								if (y < stone_height) /*TODO: Dripstone*/
-								if (region.getBlockState(placing_pos) != Blocks.AIR.getDefaultState() && region.getBlockState(placing_pos) != Blocks.CAVE_AIR.getDefaultState()) {
-//									for (int i = y; i > y - height - 1; i--) {
-//										placing_pos.set(x, i, z);
-//										if (region.isChunkLoaded(placing_pos)) {
-//											if (region.getBlockState(placing_pos) == Blocks.AIR.getDefaultState() ||
-//													region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState())
-//											region.setBlockState(placing_pos, Blocks.POINTED_DRIPSTONE.getPlacementState(new ItemPlacementContext(region.toServerWorld(), null, Hand.MAIN_HAND)), 0);
-//										}
-//									}
+								{
+									placing_pos.set(x, y, z);
+									if (region.getBlockState(placing_pos) == Blocks.STONE.getDefaultState())
+									{
+										placing_pos.set(x, y + 1, z);
+										if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState())
+										{
+											region.setBlockState(placing_pos, Blocks.POINTED_DRIPSTONE.getDefaultState(), 0);
+										}
+									}
 								}
 							}
 							
 						}
+						
+						if (random.nextInt(1000 * 2) == 0)
+						this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.DIRT, Blocks.COPPER_ORE, 5);
+						
+						if (random.nextInt(1000) == 0)
+						{
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.COPPER_ORE, 10);
+
+						}
+						
+						if (random.nextInt(1700) == 0)
+						{
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.IRON_ORE, 15);
+						}
+						
+						if (random.nextInt(700) == 0)
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.COAL_ORE, 10);
+						
+						if (random.nextInt(1500) == 0)
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.DIRT, Blocks.COAL_ORE, 10);
+						
+						
+						if (y <= 0) {
+							if (random.nextInt(2500) == 0)
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.GOLD_ORE, 10);
+							
+							if (random.nextInt(5000) == 0)
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.DIAMOND_ORE, 2);
+						}
+						
+						if (y <= -100) {
+							if (random.nextInt(1500) == 0)
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.REDSTONE_ORE, 10);
+							
+							if (random.nextInt(1500) == 0)
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.LAPIS_ORE, 10);
+						}
+						
+
+						if (random.nextInt(300) == 0)
+						{
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.DIRT, Blocks.STONE, 30);
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.SAND, Blocks.STONE, 30);
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.SNOW_BLOCK, Blocks.PACKED_ICE, 30);
+							this.GenerateOre(region, x, y, z, pos, placing_pos, BlockRegistry.MUD, Blocks.STONE, 30);
+							this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.DIRT, 30);
+						}
+						
+						if (y <= -130) {
+							if (random.nextInt(200) == 0)
+							{
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.STONE, Blocks.MAGMA_BLOCK, 30);
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.DEEPSLATE, Blocks.MAGMA_BLOCK, 30);
+							}
+							if (random.nextInt(5000) == 0)
+							{
+								this.GenerateOre(region, x, y, z, pos, placing_pos, Blocks.DEEPSLATE, Blocks.ANCIENT_DEBRIS, 2);
+							}
+						}
+						
+						
+						
+						
 						GeneratePurityGrass(region, x, y, z, pos, placing_pos);
 						GeneratePurityTrees(region, x, y, z, pos, placing_pos);
 						
@@ -322,11 +443,25 @@ public class ChunkGeneratorMixin {
 						GenerateCrimsonTrees(region, x, y, z, pos, placing_pos);
 						GenerateCrimsonMushrooms(region, x, y, z, pos, placing_pos);
 						
-						GenerateCactus(region, x, y, z, pos, placing_pos);
+						if (!beach)
+						GenerateDesertPlants(region, x, y, z, pos, placing_pos);
 						
 						GenerateSpruceTrees(region, x, y, z, pos, placing_pos);
+						GenerateTaigaPlants(region, x, y, z, pos, placing_pos);
 						
+						placing_pos.set(x, y, z);
+						if (region.getBlockState(placing_pos) == Blocks.STONE.getDefaultState()) 
+						{
+							placing_pos.set(x, y + 1, z);
+							if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+								placing_pos.set(x, y, z);
+								if (random.nextInt(300) == 0) {
+									this.GenerateGemTree(region, x, y, z, pos, placing_pos, BlockRegistry.BLUE_CRYSTAL);
+								}
+							}
+						}
 						
+						if (y <= 0)
 						if (cave_biome == 0) { /*FUNGUS AMONG US*/
 							placing_pos.set(x, y, z);
 							if (region.getBlockState(placing_pos) == Blocks.STONE.getDefaultState() ||
@@ -490,6 +625,11 @@ public class ChunkGeneratorMixin {
 									}
 								}
 							}
+						}
+						
+						if (y <= -100) 
+						{
+							GenerateLowCaveFeatures(region, x, y, z, pos, placing_pos);
 						}
 						
 					}
@@ -974,23 +1114,117 @@ public class ChunkGeneratorMixin {
 		}
 	}
 	
-	private void GenerateCactus(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos) {
+	private void GenerateTaigaPlants(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos) {
+		pos.set(x, y, z);
+		if (region.getBlockState(pos).getBlock() == Blocks.SNOW_BLOCK) {
+			if (region.getRandom().nextInt(50) == 0) {
+				placing_pos.set(x, y + 1, z);
+				if (region.isChunkLoaded(placing_pos)) {
+					if (region.getBlockState(placing_pos) != Blocks.AIR.getDefaultState()) return;
+					if (random.nextInt(10) == 0) {
+						region.setBlockState(placing_pos, Blocks.DEAD_BUSH.getDefaultState(), 0);
+					}
+					if (random.nextInt(4) == 0) {
+						region.setBlockState(placing_pos, Blocks.SWEET_BERRY_BUSH.getDefaultState(), 0);
+					}
+					if (random.nextInt(5) == 0) {
+						region.setBlockState(placing_pos, Blocks.ROSE_BUSH.getDefaultState(), 0);
+					}
+					if (random.nextInt(10) == 0) {
+						region.setBlockState(placing_pos, Blocks.AZURE_BLUET.getDefaultState(), 0);
+					}
+					
+				}
+			}
+		}
+	}
+	
+	private void GenerateGemTree(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos, Block gem) {
+		int height = random.nextInt(5) + 5;
+		for (int i = 0; i <= height + 1; i++) {
+			placing_pos.set(x, y + i, z);
+			if (region.isChunkLoaded(placing_pos))
+			{
+				if (i <= height)
+				region.setBlockState(placing_pos, Blocks.BLACKSTONE.getDefaultState(), 0);
+			}
+			if (i >= height * 0.5f) {
+				for (int j = 0; j < 4; j++) {
+					if (random.nextInt(4) == 0) {
+						placing_pos.set(x + random.nextInt(3) - 1, y + i, z + random.nextInt(3) - 1);
+						if (region.isChunkLoaded(placing_pos))
+							region.setBlockState(placing_pos, gem.getDefaultState(), 0);
+					}
+				}
+			}
+		}
+	}
+	
+	private void GenerateDesertPlants(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos) {
 		pos.set(x, y, z);
 		if (region.getBlockState(pos).getBlock() == Blocks.SAND ||
 				region.getBlockState(pos).getBlock() == BlockRegistry.CRIMSON_SAND ||
 				region.getBlockState(pos).getBlock() == BlockRegistry.EBON_SAND) {
-			if (region.getRandom().nextInt(100) == 0) {
+			if (region.getRandom().nextInt(50) == 0) {
 				placing_pos.set(x, y + 1, z);
 				if (region.isChunkLoaded(placing_pos)) {
 					if (region.getBlockState(placing_pos) != Blocks.AIR.getDefaultState()) return;
-				}
-				for (int i = 0; i < random.nextInt(3) + 2; i++) {
-					placing_pos.set(x, y + 1 + i, z);
-					if (region.isChunkLoaded(placing_pos))
-					{
-						region.setBlockState(placing_pos, Blocks.CACTUS.getDefaultState(), 0);
+					
+					if (random.nextInt(2) == 0) {
+						region.setBlockState(placing_pos, Blocks.DEAD_BUSH.getDefaultState(), 0);
+						if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.BONE_BLOCK.getDefaultState(), 0);
+							for (int i = 0; i < 4; i++) {
+								if (random.nextInt(4) == 0) {
+									placing_pos.set(x + random.nextInt(3) - 1, y + 1, z + random.nextInt(3) - 1);
+									if (region.isChunkLoaded(placing_pos))
+										region.setBlockState(placing_pos, Blocks.BONE_BLOCK.getDefaultState(), 0);
+								}
+							}
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.DEAD_BRAIN_CORAL_FAN.getDefaultState().with(CoralBlock.WATERLOGGED, false), 0);
+						} else if (random.nextInt(20) == 0) {
+							region.setBlockState(placing_pos, Blocks.DEAD_TUBE_CORAL_BLOCK.getDefaultState(), 0);
+						} else if (random.nextInt(20) == 0) {
+							region.setBlockState(placing_pos, Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							if (random.nextInt(4) == 0) {
+								placing_pos.set(x, y + 2, z);
+								if (region.isChunkLoaded(placing_pos))
+									region.setBlockState(placing_pos, Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							}
+						} else if (random.nextInt(10) == 0) {
+							//dead tree
+							int height = random.nextInt(5) + 5;
+							for (int i = 0; i <= height + 1; i++) {
+								placing_pos.set(x, y + 1 + i, z);
+								if (region.isChunkLoaded(placing_pos))
+								{
+									if (i <= height)
+									region.setBlockState(placing_pos, corruption ? BlockRegistry.EBON_LOG.getDefaultState() : BlockRegistry.SHADEWOOD_LOG.getDefaultState(), 0);
+								}
+								if (i >= height * 0.5f) {
+									for (int j = 0; j < 4; j++) {
+										if (random.nextInt(4) == 0) {
+											placing_pos.set(x + random.nextInt(3) - 1, y + i, z + random.nextInt(3) - 1);
+											if (region.isChunkLoaded(placing_pos))
+												region.setBlockState(placing_pos, corruption ? BlockRegistry.EBON_LOG.getDefaultState() : BlockRegistry.SHADEWOOD_LOG.getDefaultState(), 0);
+										}
+									}
+								}
+							}
+						}
+					} else {
+						for (int i = 0; i < random.nextInt(3) + 2; i++) {
+							placing_pos.set(x, y + 1 + i, z);
+							if (region.isChunkLoaded(placing_pos))
+							{
+								region.setBlockState(placing_pos, Blocks.CACTUS.getDefaultState(), 0);
+							}
+						}
 					}
+					
 				}
+				
 			}
 		}
 	}
@@ -1001,7 +1235,14 @@ public class ChunkGeneratorMixin {
 			if (region.getRandom().nextInt(100) == 0) {
 				placing_pos.set(x, y + 1, z);
 				if (region.isChunkLoaded(placing_pos))
-				region.setBlockState(placing_pos, BlockRegistry.VICIOUS_MUSHROOM.getDefaultState(), 0);
+				{
+					region.setBlockState(placing_pos, BlockRegistry.VICIOUS_MUSHROOM.getDefaultState(), 0);
+					if (random.nextInt(50) == 0) {
+						region.setBlockState(placing_pos, Blocks.WITHER_ROSE.getDefaultState(), 0);
+					} else if (random.nextInt(50) == 0) {
+						region.setBlockState(placing_pos, Blocks.POINTED_DRIPSTONE.getDefaultState(), 0);
+					}
+				}
 			}
 		}
 	}
@@ -1012,7 +1253,56 @@ public class ChunkGeneratorMixin {
 			if (region.getRandom().nextInt(100) == 0) {
 				placing_pos.set(x, y + 1, z);
 				if (region.isChunkLoaded(placing_pos))
-				region.setBlockState(placing_pos, BlockRegistry.VILE_MUSHROOM.getDefaultState(), 0);
+				{
+					region.setBlockState(placing_pos, BlockRegistry.VILE_MUSHROOM.getDefaultState(), 0);
+					if (random.nextInt(50) == 0) {
+						region.setBlockState(placing_pos, Blocks.WITHER_ROSE.getDefaultState(), 0);
+					}
+				}
+			}
+		}
+	}
+	
+	private void GenerateOre(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos, Block place_in, Block ore, int spread) {
+		GenerateOre(region, x, y, z, placing_pos, place_in, ore, spread);
+		if (place_in == Blocks.STONE) { 
+			GenerateOre(region, x, y, z, placing_pos, Blocks.SANDSTONE, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, Blocks.PACKED_ICE, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, BlockRegistry.MUD, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, BlockRegistry.EBON_SANDSTONE, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, BlockRegistry.CRIMSON_SANDSTONE, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, BlockRegistry.EBON_STONE, ore, spread);
+			GenerateOre(region, x, y, z, placing_pos, BlockRegistry.CRIMSON_STONE, ore, spread);
+		}
+	}
+	
+	private void GenerateOre(ChunkRegion region, int x, int y, int z, BlockPos.Mutable placing_pos, Block place_in, Block ore, int spread) {
+		if (spread <= 0) return;
+		placing_pos.set(x, y, z);
+		
+		if (region.isChunkLoaded(placing_pos))
+		if (region.getBlockState(placing_pos).getBlock() == place_in) {
+			region.setBlockState(placing_pos, ore.getDefaultState(), 0);
+			spread--;
+			GenerateOre(region, x + random.nextInt(3) - 1, y + random.nextInt(3) - 1, z + random.nextInt(3) - 1, placing_pos, place_in, ore, spread);
+			if (random.nextBoolean()) {
+				GenerateOre(region, x + random.nextInt(3) - 1, y + random.nextInt(3) - 1, z + random.nextInt(3) - 1, placing_pos, place_in, ore, spread);
+			}
+		}
+	}
+	
+	private void GenerateLowCaveFeatures(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos) {
+		pos.set(x, y, z);
+		if (region.getBlockState(pos).getBlock() == Blocks.STONE) {
+			//basalt towers
+			if (random.nextInt(50) == 0) {
+				int height = random.nextInt(4) + 3;
+				for (int i = y; i < y + height + 1; i++) {
+					placing_pos.set(x, i, z);
+					if (region.isChunkLoaded(placing_pos)) {
+						region.setBlockState(placing_pos, Blocks.BASALT.getDefaultState(), 0);
+					}
+				}
 			}
 		}
 	}
@@ -1020,11 +1310,96 @@ public class ChunkGeneratorMixin {
 	private void GeneratePurityGrass(ChunkRegion region, int x, int y, int z, BlockPos.Mutable pos, BlockPos.Mutable placing_pos) {
 		pos.set(x, y, z);
 		if (region.getBlockState(pos).getBlock() == Blocks.GRASS_BLOCK || region.getBlockState(pos).getBlock() == BlockRegistry.JUNGLE_GRASS) {
-			if (region.getRandom().nextInt(10) == 0) {
-				placing_pos.set(x, y + 1, z);
-				if (region.isChunkLoaded(placing_pos))
-				region.setBlockState(placing_pos, Blocks.GRASS.getDefaultState(), 0);
+			placing_pos.set(x, y + 1, z);
+			if (region.isChunkLoaded(placing_pos)) {
+				if (region.getBlockState(placing_pos) == Blocks.CAVE_AIR.getDefaultState()) {
+					if (region.getRandom().nextInt(10) == 0) {
+						
+						region.setBlockState(placing_pos, Blocks.GRASS.getDefaultState(), 0);
+						if (random.nextInt(50) == 0) {
+							region.setBlockState(placing_pos, Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							if (random.nextInt(5) == 0) {
+								placing_pos.set(x, y + 2, z);
+								if (region.isChunkLoaded(placing_pos))
+								region.setBlockState(placing_pos, Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							}
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.SMALL_DRIPLEAF.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.POINTED_DRIPSTONE.getDefaultState(), 0);
+						} else if (random.nextInt(50) == 0) {
+							region.setBlockState(placing_pos, Blocks.SWEET_BERRY_BUSH.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.AZURE_BLUET.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.BLUE_ORCHID.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.DANDELION.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.BIG_DRIPLEAF.getDefaultState(), 0);
+						} else if (random.nextInt(25) == 0) {
+							region.setBlockState(placing_pos, Blocks.SHROOMLIGHT.getDefaultState(), 0);
+						}
+						
+					}
+					if (random.nextInt(100) == 0) {
+						int height = 3 + random.nextInt(4);
+						for (int i = 0; i < height; i++) {
+							placing_pos.set(x, y + 1 + i, z);
+							if (region.isChunkLoaded(placing_pos)) 
+							{
+								region.setBlockState(placing_pos, Blocks.BIG_DRIPLEAF_STEM.getDefaultState(), 0);
+							}
+						}
+						placing_pos.set(x, y + 1 + height, z);
+						if (region.isChunkLoaded(placing_pos)) 
+						{
+							region.setBlockState(placing_pos, Blocks.BIG_DRIPLEAF.getDefaultState(), 0);
+						}
+					}
+				} else {
+					if (region.getRandom().nextInt(10) == 0) {
+						
+						region.setBlockState(placing_pos, Blocks.GRASS.getDefaultState(), 0);
+						if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.SUNFLOWER.getDefaultState(), 0);
+							placing_pos.set(x, y + 1, z);
+							if (region.isChunkLoaded(placing_pos)) {
+								region.setBlockState(placing_pos, Blocks.SUNFLOWER.getDefaultState().with(TallPlantBlock.HALF, DoubleBlockHalf.UPPER), 0);
+							}
+						} else if (random.nextInt(50) == 0) {
+							region.setBlockState(placing_pos, Blocks.SMALL_DRIPLEAF.getDefaultState(), 0);
+						} else if (random.nextInt(50) == 0) {
+							region.setBlockState(placing_pos, Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							if (random.nextInt(5) == 0) {
+								placing_pos.set(x, y + 2, z);
+								if (region.isChunkLoaded(placing_pos))
+								region.setBlockState(placing_pos, Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 0);
+							}
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.OXEYE_DAISY.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.ROSE_BUSH.getDefaultState(), 0);
+							placing_pos.set(x, y + 1, z);
+							if (region.isChunkLoaded(placing_pos)) {
+								region.setBlockState(placing_pos, Blocks.ROSE_BUSH.getDefaultState().with(TallPlantBlock.HALF, DoubleBlockHalf.UPPER), 0);
+							}
+						} else if (random.nextInt(50) == 0) {
+							region.setBlockState(placing_pos, Blocks.SWEET_BERRY_BUSH.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.AZURE_BLUET.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.BLUE_ORCHID.getDefaultState(), 0);
+						} else if (random.nextInt(10) == 0) {
+							region.setBlockState(placing_pos, Blocks.DANDELION.getDefaultState(), 0);
+						} else if (random.nextInt(25) == 0) {
+							region.setBlockState(placing_pos, Blocks.CRIMSON_FUNGUS.getDefaultState(), 0);
+						}
+					}
+				}
 			}
+			
+			
 		}
 	}
 }

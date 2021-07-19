@@ -27,7 +27,13 @@ public class BiomeMixin {
 	
 	@Inject(at = @At("HEAD"), method = "getFogColor", cancellable = true)
 	public void getFogColor(CallbackInfoReturnable<Integer> info) {
-		//return this.effects.getFogColor();
+		double r = sky_r * 1.2f;
+		double g = sky_g * 1.2f;
+		double b = sky_b * 1.2f;
+		if (r > 255) r = 255;
+		if (g > 255) g = 255;
+		if (b > 255) b = 255;
+		info.setReturnValue(new Color((int)r, (int)g, (int)b).getRGB());
 	}
 	
 	@Inject(at = @At("RETURN"), method = "getSkyColor", cancellable = true)
@@ -56,9 +62,9 @@ public class BiomeMixin {
 				int Y = pos.getY();
 				int Z = pos.getZ();
 				if (client.world != null)
-				for (int x = -10; x < 10; x++) {
-					for (int y = -10; y < 10; y++) {
-						for (int z = -10; z < 10; z++) {
+				for (int x = -25; x < 25; x++) {
+					for (int y = -25; y < 25; y++) {
+						for (int z = -25; z < 25; z++) {
 							pos.set(X + x, Y + y, Z + z);
 							if (!client.world.isChunkLoaded(pos)) continue;
 							Block block = client.world.getBlockState(pos).getBlock();

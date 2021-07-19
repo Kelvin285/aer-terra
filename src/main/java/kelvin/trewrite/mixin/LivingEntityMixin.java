@@ -15,6 +15,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -88,6 +89,7 @@ public abstract class LivingEntityMixin extends Entity {
 	private boolean startDamage;
 	@Inject(at = @At("HEAD"), method = "damage", cancellable = true)
 	public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> info) {
+		if (source == DamageSource.LAVA) return;
 		if (!startDamage) {
 			startDamage = true;
 			this.damage(source, amount / 10.0f);
