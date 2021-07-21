@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "trewrite:block/terra_grass_block"
+    }
+  }
+}

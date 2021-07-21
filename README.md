@@ -1,5 +1,5 @@
 # t-rewrite-fabric
-Terraria Mod for Minecraft, written using the Fabric API
+Aer-Terra Mod for Minecraft, written using the Fabric API
 
 # license
 https://mit-license.org/

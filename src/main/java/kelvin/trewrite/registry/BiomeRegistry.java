@@ -2,18 +2,30 @@ package kelvin.trewrite.registry;
 
 import java.awt.Color;
 
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.data.report.BiomeListProvider;
 import net.minecraft.sound.BiomeMoodSound;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.Category;
 import net.minecraft.world.biome.Biome.Precipitation;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.SpawnSettings.Builder;
+import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeAccessType;
+import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
+import net.minecraft.world.gen.feature.OceanRuinFeature;
 import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilders;
 
 public class BiomeRegistry {
-	
+
+	public static BiomeAccessType TERRA;
 	public static Biome PURITY;
-	
+
 	public static void RegisterBiomes() {
 		PURITY = createPurityFeatures(0.75F, 1.0F, 0.1F);
 	}

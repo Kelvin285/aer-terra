@@ -13,7 +13,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 	
 	public SlimeMonsterEntity(EntityType<? extends SlimeMonsterEntity> entityType, World world) {
 		super(entityType, world);
-		this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(10);
+		this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 	}
 	
 	@Override
@@ -23,7 +23,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 	
 	@Override
 	public int getSize() {
-		return 2;
+		return 1;
 	}
 	
 	@Override
@@ -52,7 +52,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 		
 		if (this.getTarget() != null) {
 			
-			if (this.getTarget().getEyePos().distanceTo(this.getPos()) <= 1 || stick) {
+			if (this.getTarget().getEyePos().distanceTo(this.getPos()) <= 0.5F || stick) {
 				if ((getTarget().isSprinting() || !getTarget().isOnGround()) && random.nextInt(10) == 0) {
 					stick = false;
 					this.jump();
@@ -70,7 +70,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 			if (!this.getTarget().isAlive()) {
 				stick = false;
 			}
-			if (this.getPos().distanceTo(getTarget().getPos()) <= 2) {
+			if (this.getPos().distanceTo(getTarget().getPos()) <= 0.5F) {
 				this.tryAttack(getTarget());
 			}
 		} else {
