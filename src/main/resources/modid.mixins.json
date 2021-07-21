@@ -1,10 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "kelvin.trewrite.mixin",
+  "package": "kelvin.aer_terra.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-	  "NoiseChunkGeneratorMixin"
+	  "common.NoiseChunkGeneratorMixin"
   ],
   "client": [
   ],

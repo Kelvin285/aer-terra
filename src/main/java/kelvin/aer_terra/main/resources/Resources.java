@@ -7,6 +7,8 @@ import net.minecraft.util.math.MathHelper;
 
 public class Resources {
 	
+	public static final int world_size = 32;
+	
 	public static void makeFieldAccessible(Field field) throws Exception {
 		Field modifiers = Field.class.getDeclaredField("modifiers");
 		modifiers.setAccessible(true);
@@ -21,7 +23,7 @@ public class Resources {
 	
 	public static float getDistanceFromDeltas(double dx, double dy, double dz)
     {
-        return MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        return MathHelper.sqrt((float)(dx * dx + dy * dy + dz * dz));
     }
 	
 	public static float lerp(float a, float b, float lerp)

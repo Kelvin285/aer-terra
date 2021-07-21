@@ -1,11 +1,11 @@
-package kelvin.trewrite.registry;
+package kelvin.aer_terra.registry;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import kelvin.trewrite.main.resources.Resources;
+import kelvin.aer_terra.main.resources.Resources;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;

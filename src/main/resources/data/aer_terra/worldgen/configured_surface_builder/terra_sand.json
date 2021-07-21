@@ -1,0 +1,14 @@
+{
+  "type": "default",
+  "config": {
+    "top_material": {
+      "Name": "aer_terra:terra_sand"
+    },
+    "under_material": {
+      "Name": "aer_terra:terra_sand"
+    },
+    "underwater_material": {
+      "Name": "aer_terra:terra_sand"
+    }
+  }
+}

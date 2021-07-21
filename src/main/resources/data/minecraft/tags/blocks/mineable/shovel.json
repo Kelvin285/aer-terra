@@ -33,8 +33,8 @@
     "minecraft:black_concrete_powder",
     "minecraft:soul_soil",
     "minecraft:rooted_dirt",
-	"trewrite:terra_grass_block",
-	"trewrite:terra_sand",
-	"trewrite:terra_dirt"
+	"aer_terra:terra_grass_block",
+	"aer_terra:terra_sand",
+	"aer_terra:terra_dirt"
   ]
 }

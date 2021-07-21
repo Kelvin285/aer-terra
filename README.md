@@ -1,4 +1,4 @@
-# t-rewrite-fabric
+# aer-terra (Fabric 1.17)
 Aer-Terra Mod for Minecraft, written using the Fabric API
 
 # license

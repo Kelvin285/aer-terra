@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "trewrite",
+  "id": "aer_terra",
   "version": "${version}",
 
-  "name": "Trewrite",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Aer Terra",
+  "description": "A Terraria-inspired mod!",
   "authors": [
     "Kelvin285"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/Kelvin285/aer-terra",
+    "sources": "https://github.com/Kelvin285/aer-terra"
   },
 
   "license": "CC0-1.0",
@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "kelvin.trewrite.main.Trewrite"
+      "kelvin.aer_terra.main.AerTerra"
     ]
   },
   "mixins": [

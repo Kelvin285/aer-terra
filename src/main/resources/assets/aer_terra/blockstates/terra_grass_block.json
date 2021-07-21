@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "aer_terra:block/terra_grass_block"
+    }
+  }
+}
