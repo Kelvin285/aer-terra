@@ -1,0 +1,14 @@
+{
+  "type": "default",
+  "config": {
+    "top_material": {
+      "Name": "aer_terra:flamestone"
+    },
+    "under_material": {
+      "Name": "aer_terra:flamestone"
+    },
+    "underwater_material": {
+      "Name": "aer_terra:flamestone"
+    }
+  }
+}

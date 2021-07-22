@@ -1,6 +1,5 @@
 package kelvin.aer_terra.blocks;
 
-import kelvin.aer_terra.registry.BlockRegistry;
 import net.minecraft.block.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
@@ -12,8 +11,18 @@ import net.minecraft.world.chunk.light.ChunkLightProvider;
 import java.util.Random;
 
 public class TerraGrassBlock extends Block {
-    public TerraGrassBlock(AbstractBlock.Settings settings) {
+    private Block[] spread_to_block;
+    private Block dirt;
+    public TerraGrassBlock(AbstractBlock.Settings settings, Block dirt, Block[] spreadable) {
         super(settings);
+        this.spread_to_block = spreadable;
+        this.dirt = dirt;
+    }
+
+    public TerraGrassBlock(AbstractBlock.Settings settings, Block dirt) {
+        super(settings);
+        this.dirt = dirt;
+        spread_to_block = new Block[]{dirt};
     }
 
     private static boolean canSurvive(BlockState state, WorldView world, BlockPos pos) {
@@ -34,14 +43,18 @@ public class TerraGrassBlock extends Block {
 
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (!canSurvive(state, world, pos)) {
-            world.setBlockState(pos, BlockRegistry.TERRA_DIRT.getDefaultState());
+            world.setBlockState(pos, dirt.getDefaultState());
         } else {
             if (world.getLightLevel(pos.up()) >= 9) {
                 for(int i = 0; i < 4; ++i) {
                     BlockPos blockPos = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
-                    if (world.getBlockState(blockPos).isOf(BlockRegistry.TERRA_DIRT) && canSpread(getDefaultState(), world, blockPos)) {
-                        world.setBlockState(blockPos, getDefaultState());
+
+                    for (int j = 0; j < spread_to_block.length; j++) {
+                        if (world.getBlockState(blockPos).isOf(spread_to_block[j]) && canSpread(getDefaultState(), world, blockPos)) {
+                            world.setBlockState(blockPos, getDefaultState());
+                        }
                     }
+
                 }
             }
 

@@ -15,9 +15,9 @@
     ]
   },
   "features": [
-    [],
-    [],
-    [],
+    ["minecraft:lake_water"],
+    ["aer_terra:trees_terrawood"],
+    ["aer_terra:patch_terra_grass"],
     [],
     [],
     [],

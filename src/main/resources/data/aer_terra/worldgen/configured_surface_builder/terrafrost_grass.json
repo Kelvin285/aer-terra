@@ -1,0 +1,14 @@
+{
+  "type": "default",
+  "config": {
+    "top_material": {
+      "Name": "aer_terra:terrafrost_grass_block"
+    },
+    "under_material": {
+      "Name": "aer_terra:terrafrost_dirt"
+    },
+    "underwater_material": {
+      "Name": "aer_terra:terrafrost_sand"
+    }
+  }
+}

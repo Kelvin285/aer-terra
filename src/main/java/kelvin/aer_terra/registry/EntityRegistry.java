@@ -43,7 +43,7 @@ public class EntityRegistry {
 		BLUE_SLIME = Registry.register(
 				Registry.ENTITY_TYPE,
 				new Identifier("aer_terra", "blue_slime"),
-				FabricEntityTypeBuilder.create(SpawnGroup.MISC, SlimeMonsterEntity::new).size(EntityDimensions.fixed(2.04F, 2.04F)).build()
+				FabricEntityTypeBuilder.create(SpawnGroup.MISC, SlimeMonsterEntity::new).size(EntityDimensions.fixed(0.5F, 0.5F)).build()
 				);
 		RegisterAttributes();
 		RegisterModels();

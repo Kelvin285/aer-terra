@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "aer_terra:block/terrafrost_dirt"
+  }
+}

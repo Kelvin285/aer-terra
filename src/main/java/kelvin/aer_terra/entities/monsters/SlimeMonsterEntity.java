@@ -14,6 +14,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 	public SlimeMonsterEntity(EntityType<? extends SlimeMonsterEntity> entityType, World world) {
 		super(entityType, world);
 		this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
+		this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(5);
 	}
 	
 	@Override
@@ -48,8 +49,7 @@ public class SlimeMonsterEntity extends SlimeEntity {
 		super.tick();
 		this.noClip = false;
 		
-		this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0 / 100.0);
-		
+
 		if (this.getTarget() != null) {
 			
 			if (this.getTarget().getEyePos().distanceTo(this.getPos()) <= 0.5F || stick) {

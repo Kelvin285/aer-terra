@@ -35,6 +35,15 @@
     "minecraft:rooted_dirt",
 	"aer_terra:terra_grass_block",
 	"aer_terra:terra_sand",
-	"aer_terra:terra_dirt"
+	"aer_terra:terra_dirt",
+	"aer_terra:electrified_grass_block",
+	"aer_terra:electrified_dirt",
+	"aer_terra:electrified_sand",
+	"aer_terra:terrafrost_grass_block",
+	"aer_terra:terrafrost_dirt",
+	"aer_terra:terrafrost_sand",
+	"aer_terra:fire_grass_block",
+	"aer_terra:fire_dirt",
+	"aer_terra:fire_sand"
   ]
 }

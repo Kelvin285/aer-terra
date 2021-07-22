@@ -1,0 +1,48 @@
+{
+  "scale": 0.2,
+  "effects": {
+    "mood_sound": {},
+    "sky_color": 13094634,
+    "fog_color": 12042728,
+    "water_color": 13100266,
+    "water_fog_color": 9873384
+  },
+  "surface_builder": "aer_terra:rift_grass",
+  "carvers": {
+    "air": [
+      "minecraft:cave",
+      "minecraft:canyon"
+    ]
+  },
+  "features": [
+    [],
+    [],
+    ["aer_terra:patch_electrified_grass"],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "starts": [
+    
+  ],
+  "spawners": {
+    "monster": [],
+    "creature": [],
+    "ambient": [],
+    "underground_water_creature": [],
+    "water_creature": [],
+    "water_ambient": [],
+    "misc": []
+  },
+  "spawn_costs": {},
+  "player_spawn_friendly": true,
+  "precipitation": "rain",
+  "temperature": 0.7,
+  "downfall": 0.8,
+  "category": "forest",
+  "depth": 0.1
+}

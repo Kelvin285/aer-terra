@@ -46,6 +46,36 @@
             "humidity": 0.0
           },
           "biome": "aer_terra:aer_terra_desert"
+        },
+		{
+          "parameters": {
+            "altitude": 0.0,
+            "weirdness": 0.0,
+            "offset": 0.0,
+            "temperature": 0.0,
+            "humidity": 0.0
+          },
+          "biome": "aer_terra:aer_terra_flame"
+        },
+		{
+          "parameters": {
+            "altitude": 0.0,
+            "weirdness": 0.0,
+            "offset": 0.0,
+            "temperature": 0.0,
+            "humidity": 0.0
+          },
+          "biome": "aer_terra:aer_terra_frost"
+        },
+		{
+          "parameters": {
+            "altitude": 0.0,
+            "weirdness": 0.0,
+            "offset": 0.0,
+            "temperature": 0.0,
+            "humidity": 0.0
+          },
+          "biome": "aer_terra:aer_terra_rift"
         }
       ],
       "temperature_noise": {

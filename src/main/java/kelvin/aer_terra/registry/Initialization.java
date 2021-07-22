@@ -26,6 +26,7 @@ public class Initialization {
 
 		BlockRegistry.RegisterBlocks();
 		ItemRegistry.RegisterItems();
+		FeatureRegistry.RegisterFeatures();
 	}
 
 }

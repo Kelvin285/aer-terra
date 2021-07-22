@@ -4,7 +4,8 @@
   "package": "kelvin.aer_terra.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-	  "common.NoiseChunkGeneratorMixin"
+	"common.NoiseChunkGeneratorMixin",
+    "common.CaveCarverMixin"
   ],
   "client": [
   ],

@@ -1,7 +1,25 @@
 {
-	"block.aer_terra.riftstone":"Riftstone",
 	"block.aer_terra.terrastone":"Terrastone",
 	"block.aer_terra.terra_grass_block":"Terra Grass Block",
 	"block.aer_terra.terra_dirt":"Terra Dirt",
-	"block.aer_terra.terra_sand":"Terra Sand"
+	"block.aer_terra.terra_sand":"Terra Sand",
+	"block.aer_terra.terrafrost_grass_block":"Terrafrost Grass Block",
+	"block.aer_terra.terrafrost_stone":"Terrafrost Stone",
+	"block.aer_terra.terrafrost_dirt":"Terrafrost Dirt",
+	"block.aer_terra.terrafrost_sand":"Terrafrost Sand",
+	"block.aer_terra.flamestone":"Flamestone",
+	"block.aer_terra.fire_grass_block":"Fire Grass Block",
+	"block.aer_terra.fire_dirt":"Fire Dirt",
+	"block.aer_terra.fire_sand":"Fire Sand",
+	"block.aer_terra.electrified_terrastone":"Electrified Terrastone",
+	"block.aer_terra.electrified_grass_block":"Electrified Grass Block",
+	"block.aer_terra.electrified_dirt":"Electrified Dirt",
+	"block.aer_terra.electrified_sand":"Electrified Sand",
+	"block.aer_terra.terrawood_sapling":"Terrawood Sapling",
+	"block.aer_terra.terrawood_leaves":"Terrawood Leaves",
+	"block.aer_terra.terrawood_log":"Terrawood Log",
+	"block.aer_terra.terra_grass":"Terra Grass",
+	"block.aer_terra.terrafrost_grass":"Terrafrost Grass",
+	"block.aer_terra.electrified_grass":"Electrified Grass",
+	"block.aer_terra.fire_grass":"Fire Grass"
 }
